@@ -3,6 +3,32 @@ var pen = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+var paused = false;
+var running = false;
+var setButton = document.querySelector('#setButton');
+var settings = document.querySelector('#settings');
+var sizeInput = settings.querySelector('#size');
+var speedInput = settings.querySelector('#speed');
+var algInput = settings.querySelector('#algorithm');
+var size = sizeInput.value;
+var speed = speedInput.value;
+var algorithm = algInput.value;
+
+setButton.addEventListener('click', function () {
+    paused = !paused;
+    if (paused) {
+        settings.style.display = 'block';
+    } else {
+        settings.style.display = 'none';
+        speed = speedInput.value;
+        if (sizeInput.value !== size || algInput.value !== algorithm) {
+            size = sizeInput.value;
+            algorithm = algInput.value;
+            reset();
+        }
+    }
+});
+
 class Cell {
     constructor(r, c) {
         this.r = r;
@@ -102,32 +128,46 @@ class Maze {
     }
 }
 
-var maze = new Maze(canvas.width, canvas.height, 20);
-maze.pushActiveCell(maze.getRandomCell());
+var maze = {};
+function reset() {
+    pen.clearRect(0, 0, canvas.width, canvas.height);
+    maze = new Maze(canvas.width, canvas.height, size);
+    maze.pushActiveCell(maze.getRandomCell());
+    if (!running) {
+        running = true;
+        step();
+    }
+}
 
 function step() {
-    for (let i = 0 ; i < 1 ; i++) {
-        let neighbors = [];
-        for (let theta = 0 ; theta < 4 ; theta++) {
-            let testCell = maze.checkDirection(theta);
-            if (testCell) {
-                neighbors.push(testCell);
+    if (!paused) {
+        for (let i = 0 ; i < speed ; i++) {
+            let neighbors = [];
+            for (let theta = 0 ; theta < 4 ; theta++) {
+                let testCell = maze.checkDirection(theta);
+                if (testCell) {
+                    neighbors.push(testCell);
+                }
             }
-        }
-        if (neighbors.length > 0) {
-            let rdmNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
-            let currCell = maze.getLastActiveCell();
-            maze.pushActiveCell(rdmNeighbor);
-            maze.drawPath('#808080', currCell.r, currCell.c, rdmNeighbor.r, rdmNeighbor.c);
-        } else {
-            let lastCell = maze.popActiveCell();
-            let currCell = maze.getLastActiveCell();
-            maze.drawPath('#ffffff', currCell.r, currCell.c, lastCell.r, lastCell.c);
-        }
-        if (maze.activeCells.length === 0) {
-            return;
+            if (neighbors.length > 0) {
+                let rdmNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
+                let currCell = maze.getLastActiveCell();
+                maze.pushActiveCell(rdmNeighbor);
+                maze.drawPath('#808080', currCell.r, currCell.c, rdmNeighbor.r, rdmNeighbor.c);
+            } else {
+                let lastCell = maze.popActiveCell();
+                if (maze.activeCells.length > 0) {
+                    let currCell = maze.getLastActiveCell();
+                    maze.drawPath('#ffffff', currCell.r, currCell.c, lastCell.r, lastCell.c);
+                }
+            }
+            if (maze.activeCells.length === 0) {
+                running = false;
+                return;
+            }
         }
     }
     requestAnimationFrame(step);
 }
-step();
+
+reset();
