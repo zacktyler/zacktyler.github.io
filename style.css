@@ -34,7 +34,8 @@ canvas {
     display: none;
     font-family: Righteous, sans-serif;
     text-align: center;
-    line-height: 150px;
+    line-height: 120px;
+    overflow: auto;
 }
 
 #settings h1 {
@@ -47,7 +48,7 @@ canvas {
     margin-right: 20px;
 }
 
-#settings input, #settings select {
+#settings input, #settings select, #settings button {
     font-family: Righteous, sans-serif;
     font-size: 36px;
     text-align: center;
@@ -56,6 +57,10 @@ canvas {
 
 #settings input {
     width: 100px;
+}
+
+#settings button {
+    height: 50px;
 }
 
 input[type=number]::-webkit-inner-spin-button, 

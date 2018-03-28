@@ -11,16 +11,21 @@
     <div id="setButton"></div>
     <div id="settings">
         <h1>Settings</h1>
-        <h2>Cell Size</h2>
-        <input id="size" type="number" value="30" />
-        <br />
         <h2>Run Speed</h2>
-        <input id="speed" type="number" value="1" />
+        <input class="set" type="number" value="1" />
+        <br />
+        <h2>Cell Size</h2>
+        <input class="set" type="number" value="30" />
         <br />
         <h2>Algorithm</h2>
-        <select id="algorithm">
+        <select class="set">
             <option value="RB">Recursive Backtracker</option>
+            <option value="PA">Prim's Algorithm</option>
         </select>
+        <br />
+        <button>
+            New Maze!
+        </button>
     </div>
     <script src="mazes.js"></script>
 </body>

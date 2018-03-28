@@ -6,28 +6,45 @@ canvas.height = window.innerHeight;
 var paused = false;
 var running = false;
 var setButton = document.querySelector('#setButton');
-var settings = document.querySelector('#settings');
-var sizeInput = settings.querySelector('#size');
-var speedInput = settings.querySelector('#speed');
-var algInput = settings.querySelector('#algorithm');
-var size = sizeInput.value;
-var speed = speedInput.value;
-var algorithm = algInput.value;
+var setWindow = document.querySelector('#settings');
+var inputs = setWindow.querySelectorAll('.set');
+var newButton = setWindow.querySelector('button');
+var settings = [];
+getAllSettings();
 
-setButton.addEventListener('click', function () {
+function getAllSettings() {
+    settings = [];
+    for(let input of inputs) {
+        settings.push(input.value);
+    }
+}
+
+function toggleSettings() {
     paused = !paused;
     if (paused) {
-        settings.style.display = 'block';
+        setWindow.style.display = 'block';
     } else {
-        settings.style.display = 'none';
-        speed = speedInput.value;
-        if (sizeInput.value !== size || algInput.value !== algorithm) {
-            size = sizeInput.value;
-            algorithm = algInput.value;
-            reset();
-        }
+        setWindow.style.display = 'none';
+        settings[0] = inputs[0].value;
     }
+}
+
+window.addEventListener('resize', function () {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    reset();
 });
+
+setButton.addEventListener('click', function () {
+    toggleSettings();
+});
+
+newButton.addEventListener('click', function () {
+    getAllSettings();
+    toggleSettings();
+    reset();
+});
+
 
 class Cell {
     constructor(r, c) {
@@ -82,8 +99,8 @@ class Maze {
     }
 
     //Checks for a possible neighbor in the given direction
-    checkDirection(dir) {
-        let activeCell = this.getLastActiveCell();
+    checkDirection(cellNum, dir) {
+        let activeCell = this.getActiveCell(cellNum);
         let r = activeCell.r;
         let c = activeCell.c;
         r -= Math.round(Math.sin((Math.PI / 2) * dir));
@@ -107,15 +124,15 @@ class Maze {
         cell.visited = true;
         this.activeCells.push(cell);
     }
-
-    //Pops and returns the last Cell in the activeCells stack
-    popActiveCell() {
-        return this.activeCells.pop();
+    
+    //Removes and returns the given Cell from the activeCells array
+    removeActiveCell(n) {
+        return this.activeCells.splice(n, 1);
     }
 
-    //Returns the last Cell in the activeCells stack
-    getLastActiveCell() {
-        return this.activeCells[this.activeCells.length - 1];
+    //Returns the given Cell from the activeCells array
+    getActiveCell(n) {
+        return this.activeCells[n];
     }
 
     drawPath(color, r1, c1, r2, c2) {
@@ -126,13 +143,56 @@ class Maze {
         let h = Math.abs(r2 - r1) * this.rInc + this.thickness;
         pen.fillRect(x, y, w, h);
     }
+
+    //Now for ALL THE ALGORITHMS
+    acAlgorithms(last) {
+        if (this.activeCells.length === 0) {
+            this.pushActiveCell(this.getRandomCell());
+        }
+        let cellNum = 0;
+        if (last) { //Choose the cell to start from
+            cellNum = this.activeCells.length - 1;
+        } else {
+            cellNum = Math.floor(Math.random() * this.activeCells.length);
+        }
+        let neighbors = [];
+        for (let theta = 0 ; theta < 4 ; theta++) {
+            let testCell = this.checkDirection(cellNum, theta);
+            if (testCell) {
+                neighbors.push(testCell);
+            }
+        }
+        if (neighbors.length > 0) {
+            let rdmNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
+            let currCell = this.getActiveCell(cellNum);
+            this.pushActiveCell(rdmNeighbor);
+            if (last) {
+                this.drawPath('#808080', currCell.r, currCell.c, rdmNeighbor.r, rdmNeighbor.c);
+            } else {
+                this.drawPath('#ffffff', currCell.r, currCell.c, rdmNeighbor.r, rdmNeighbor.c);
+            }
+        } else {
+            let lastCell = this.removeActiveCell(cellNum)[0];
+            if (last && this.activeCells.length > 0) {
+                let currCell = this.getActiveCell(cellNum - 1);
+                this.drawPath('#ffffff', currCell.r, currCell.c, lastCell.r, lastCell.c);
+            }
+        }
+        if (this.activeCells.length === 0) {
+            running = false;
+        }
+    }
 }
+
+var algorithms = {};
+algorithms['RB'] = function () { maze.acAlgorithms(true); }
+algorithms['PA'] = function () { maze.acAlgorithms(false); }
 
 var maze = {};
 function reset() {
+    getAllSettings();
     pen.clearRect(0, 0, canvas.width, canvas.height);
-    maze = new Maze(canvas.width, canvas.height, size);
-    maze.pushActiveCell(maze.getRandomCell());
+    maze = new Maze(canvas.width, canvas.height, settings[1]);
     if (!running) {
         running = true;
         step();
@@ -141,28 +201,9 @@ function reset() {
 
 function step() {
     if (!paused) {
-        for (let i = 0 ; i < speed ; i++) {
-            let neighbors = [];
-            for (let theta = 0 ; theta < 4 ; theta++) {
-                let testCell = maze.checkDirection(theta);
-                if (testCell) {
-                    neighbors.push(testCell);
-                }
-            }
-            if (neighbors.length > 0) {
-                let rdmNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
-                let currCell = maze.getLastActiveCell();
-                maze.pushActiveCell(rdmNeighbor);
-                maze.drawPath('#808080', currCell.r, currCell.c, rdmNeighbor.r, rdmNeighbor.c);
-            } else {
-                let lastCell = maze.popActiveCell();
-                if (maze.activeCells.length > 0) {
-                    let currCell = maze.getLastActiveCell();
-                    maze.drawPath('#ffffff', currCell.r, currCell.c, lastCell.r, lastCell.c);
-                }
-            }
-            if (maze.activeCells.length === 0) {
-                running = false;
+        for (let i = 0 ; i < settings[0]; i++) {
+            algorithms[settings[2]]();
+            if (!running) {
                 return;
             }
         }
