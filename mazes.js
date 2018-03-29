@@ -45,19 +45,44 @@ newButton.addEventListener('click', function () {
     reset();
 });
 
-
 class Cell {
     constructor(r, c) {
         this.r = r;
         this.c = c;
         this.visited = false;
-        this.connectsTo = [];
+        this.root = this;
+        this.branches = [];
     }
 
-    //Connects two Cells, this one and another given one
-    connectTo(other) {
-        this.connectsTo.push(other);
-        other.connectsTo.push(this);
+    setRootTo(root) {
+        this.root = root;
+        root.branches.push(this);
+        for (let branch of this.branches) {
+            branch.setRootTo(root);
+        }
+        this.branches = [];
+    }
+}
+
+class Edge {
+    constructor(cell1, cell2) {
+        this.cell1 = cell1;
+        this.cell2 = cell2;
+    }
+
+    removeEdge() {
+        if (this.cell1.root === this.cell2.root) {
+            return false;
+        } else {
+            let root1 = this.cell1.root;
+            let root2 = this.cell2.root;
+            if (root1.branches.length > root2.branches.length) {
+                root2.setRootTo(root1);
+            } else {
+                root1.setRootTo(root2);
+            }
+            return true;
+        }
     }
 }
 
@@ -83,6 +108,18 @@ class Maze {
                 row.push(new Cell(r, c));
             }
             this.cells.push(row);
+        }
+        //Edges
+        this.edges = [];
+        for (let r = 0 ; r < this.rows - 1 ; r++) {
+            for (let c = 0 ; c < this.cols ; c++) {
+                this.edges.push(new Edge(this.cells[r][c], this.cells[r + 1][c]));
+            }
+        }
+        for (let r = 0 ; r < this.rows ; r++) {
+            for (let c = 0 ; c < this.cols - 1 ; c++) {
+                this.edges.push(new Edge(this.cells[r][c], this.cells[r][c + 1]));
+            }
         }
     }
 
@@ -110,7 +147,6 @@ class Maze {
         } else {
             return false;
         }
-        
     }
 
     getRandomCell() {
@@ -145,7 +181,7 @@ class Maze {
     }
 
     //Now for ALL THE ALGORITHMS
-    acAlgorithms(last) {
+    acAlgorithms(last, both) {
         if (this.activeCells.length === 0) {
             this.pushActiveCell(this.getRandomCell());
         }
@@ -167,13 +203,14 @@ class Maze {
             let currCell = this.getActiveCell(cellNum);
             this.pushActiveCell(rdmNeighbor);
             if (last) {
-                this.drawPath('#808080', currCell.r, currCell.c, rdmNeighbor.r, rdmNeighbor.c);
+                let color = (both) ? '#ffffff' : '#808080';
+                this.drawPath(color, currCell.r, currCell.c, rdmNeighbor.r, rdmNeighbor.c);
             } else {
                 this.drawPath('#ffffff', currCell.r, currCell.c, rdmNeighbor.r, rdmNeighbor.c);
             }
         } else {
             let lastCell = this.removeActiveCell(cellNum)[0];
-            if (last && this.activeCells.length > 0) {
+            if (last && !both && this.activeCells.length > 0) {
                 let currCell = this.getActiveCell(cellNum - 1);
                 this.drawPath('#ffffff', currCell.r, currCell.c, lastCell.r, lastCell.c);
             }
@@ -182,11 +219,32 @@ class Maze {
             running = false;
         }
     }
+
+    kruskalgorithm() {
+        if (this.edges.length > 0) {
+            let merged = false;
+            do {
+                let edgeNum = Math.floor(Math.random() * this.edges.length);
+                let edge = this.edges[edgeNum];
+                merged = edge.removeEdge();
+                if (merged) {
+                    let cell1 = edge.cell1;
+                    let cell2 = edge.cell2;
+                    this.drawPath('#ffffff', cell1.r, cell1.c, cell2.r, cell2.c);
+                }
+                this.edges.splice(edgeNum, 1);
+            } while (!merged && this.edges.length > 0);
+        } else {
+            running = false;
+        }
+    }
 }
 
 var algorithms = {};
-algorithms['RB'] = function () { maze.acAlgorithms(true); }
-algorithms['PA'] = function () { maze.acAlgorithms(false); }
+algorithms['RB'] = function () { maze.acAlgorithms(true, false); }
+algorithms['PA'] = function () { maze.acAlgorithms(false, false); }
+algorithms['PR'] = function () { maze.acAlgorithms(Math.random() > 0.25, true); }
+algorithms['KA'] = function () { maze.kruskalgorithm(); }
 
 var maze = {};
 function reset() {
