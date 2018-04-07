@@ -14,8 +14,8 @@ window.addEventListener('resize', function () {
 });
 
 window.addEventListener('touchstart', function (e) {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
+    mouse.x = e.touches[0].clientX;
+    mouse.y = e.touches[0].clientY;
     if (i < bubbles.length) {
         bubbles[i].checkMouse();
     }
