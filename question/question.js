@@ -19,7 +19,7 @@ window.addEventListener('touchstart', function (e) {
     if (i < bubbles.length) {
         bubbles[i].checkMouse();
     }
-});
+}); 
 
 window.addEventListener('click', function (e) {
     mouse.x = e.clientX;
