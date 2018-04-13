@@ -5,10 +5,12 @@ canvas.height = window.innerHeight;
 
 var paused = false;
 var running = false;
+var solving = false;
 var setButton = document.querySelector('#setButton');
 var setWindow = document.querySelector('#settings');
 var inputs = setWindow.querySelectorAll('.set');
-var newButton = setWindow.querySelector('button');
+var newButton = setWindow.querySelector('#new');
+var solveButton = setWindow.querySelector('#solve');
 var settings = [];
 getAllSettings();
 
@@ -45,6 +47,11 @@ newButton.addEventListener('click', function () {
     reset();
 });
 
+solveButton.addEventListener('click', function () {
+    startSolve();
+    toggleSettings();
+});
+
 class Cell {
     constructor(r, c) {
         this.r = r;
@@ -52,6 +59,7 @@ class Cell {
         this.visited = false;
         this.root = this;
         this.branches = [];
+        this.paths = [];
     }
 
     setRootTo(root) {
@@ -61,6 +69,11 @@ class Cell {
             branch.setRootTo(root);
         }
         this.branches = [];
+    }
+
+    connectTo(other) {
+        this.paths.push(other);
+        other.paths.push(this);
     }
 }
 
@@ -208,6 +221,7 @@ class Maze {
             } else {
                 this.drawPath('#ffffff', currCell.r, currCell.c, rdmNeighbor.r, rdmNeighbor.c);
             }
+            currCell.connectTo(rdmNeighbor);
         } else {
             let lastCell = this.removeActiveCell(cellNum)[0];
             if (last && !both && this.activeCells.length > 0) {
@@ -231,11 +245,37 @@ class Maze {
                     let cell1 = edge.cell1;
                     let cell2 = edge.cell2;
                     this.drawPath('#ffffff', cell1.r, cell1.c, cell2.r, cell2.c);
+                    cell1.connectTo(cell2);
                 }
                 this.edges.splice(edgeNum, 1);
             } while (!merged && this.edges.length > 0);
         } else {
             running = false;
+        }
+    }
+
+    solveAlgorithm() {
+        if (this.activeCells.length === 0) {
+            this.pushActiveCell(this.cells[0][0]);
+        }
+        let lastCell = this.getActiveCell(this.activeCells.length - 1);
+        let possibleN = [];
+        for(let neighbor of lastCell.paths) {
+            if (!neighbor.visited) {
+                possibleN.push(neighbor);
+            }
+        }
+        if (possibleN.length > 0) {
+            let rdmNeighbor = possibleN[Math.floor(Math.random() * possibleN.length)];
+            this.drawPath('#ff0000', lastCell.r, lastCell.c, rdmNeighbor.r, rdmNeighbor.c);
+            this.pushActiveCell(rdmNeighbor);
+            if (rdmNeighbor.c === this.cols - 1 && rdmNeighbor.r === this.rows - 1) {
+                running = false;
+            }
+        } else {
+            this.removeActiveCell(this.activeCells.length - 1);
+            let newLast = this.getActiveCell(this.activeCells.length - 1);
+            this.drawPath('#ffffff', lastCell.r, lastCell.c, newLast.r, newLast.c);
         }
     }
 }
@@ -248,20 +288,39 @@ algorithms['KA'] = function () { maze.kruskalgorithm(); }
 
 var maze = {};
 function reset() {
+    solving = false;
     getAllSettings();
     pen.clearRect(0, 0, canvas.width, canvas.height);
     maze = new Maze(canvas.width, canvas.height, settings[1]);
     if (!running) {
         running = true;
+        solveButton.disabled = true;
         step();
     }
+}
+
+function startSolve() {
+    for(let cellRow of maze.cells) {
+        for(let cell of cellRow) {
+            cell.visited = false;
+        }
+    }
+    solving = true;
+    running = true;
+    solveButton.disabled = true;
+    step();
 }
 
 function step() {
     if (!paused) {
         for (let i = 0 ; i < settings[0]; i++) {
-            algorithms[settings[2]]();
+            if (solving) {
+                maze.solveAlgorithm();
+            } else {
+                algorithms[settings[2]]();
+            }
             if (!running) {
+                solveButton.disabled = solving;
                 return;
             }
         }

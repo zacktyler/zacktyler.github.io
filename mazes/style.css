@@ -61,6 +61,7 @@ canvas {
 
 #settings button {
     height: 50px;
+    display: inline-block;
 }
 
 input[type=number]::-webkit-inner-spin-button, 
