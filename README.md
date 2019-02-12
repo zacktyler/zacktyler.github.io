@@ -1,6 +1,2 @@
-# zetyler.github.io
-
-Hi.
-
-## zetyler.github.io
-Made some changes so that the styling was not as bad.
+# zetyler.github.io/mazes
+Made some changes to the styling so it is not as bad.
