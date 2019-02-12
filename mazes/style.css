@@ -8,6 +8,7 @@
 
 * {
     margin: 0;
+    box-sizing: border-box;
 }
 
 body {
@@ -20,10 +21,20 @@ canvas {
 
 #setButton {
     position: absolute;
-    right: 0;
-    border: 30px solid rgba(0,255,255,0.9);
-    border-radius: 50%;
+    right: 10px;
+    top: 10px;
+    width: 80px;
+    height: 45px;
+    background-color: hsla(180, 100%, 45%, 0.9);
+    border-radius: 5px;
     z-index: 10;
+    font-size: 1rem;
+    text-align: center;
+    line-height: 45px;
+}
+
+#setButton:hover {
+    background-color: hsla(180, 100%, 60%, 0.9);
 }
 
 #settings {
@@ -33,35 +44,55 @@ canvas {
     position: absolute;
     display: none;
     font-family: Righteous, sans-serif;
-    text-align: center;
-    line-height: 120px;
     overflow: auto;
+    grid-template: 4rem 4rem 4rem 4rem / 1fr 1fr;
+    grid-gap: 10px;
+    padding: 10px;
+    justify-content: center;
+    align-content: center;
+    justify-items: center;
+    align-items: center;
 }
 
-#settings h1 {
-    font-size: 72px;
+#settings p, #settings input, #settings select, #settings button {
+    height: 3rem;
+    line-height: 3rem;
+    padding: 0;
+    border: none;
+    font-family: Righteous, sans-serif;
 }
 
-#settings h2 {
-    font-size: 36px;
+#settings input, #settings button {
+    padding-left: 5px;
+}
+
+@media (min-width: 320px) {
+    #settings p, #settings input, #settings select, #settings button {
+        font-size: 1.25rem;
+        width: 40%;
+        min-width: 140px;
+    }
+}
+
+@media (min-width: 550px) {
+    #settings p, #settings input, #settings select, #settings button {
+        font-size: 2rem;
+    }
+}
+
+.text p {
     display: inline;
-    margin-right: 20px;
+}
+
+#settings .text {
+    text-align: right;
+    justify-self: end;
+    line-height: 0;
 }
 
 #settings input, #settings select, #settings button {
-    font-family: Righteous, sans-serif;
-    font-size: 36px;
-    text-align: center;
-    height: 100px;
-}
-
-#settings input {
-    width: 100px;
-}
-
-#settings button {
-    height: 50px;
-    display: inline-block;
+    text-align: left;
+    justify-self: start;
 }
 
 input[type=number]::-webkit-inner-spin-button, 

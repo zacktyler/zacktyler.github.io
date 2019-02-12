@@ -24,7 +24,7 @@ function getAllSettings() {
 function toggleSettings() {
     paused = !paused;
     if (paused) {
-        setWindow.style.display = 'block';
+        setWindow.style.display = 'grid';
     } else {
         setWindow.style.display = 'none';
         settings[0] = inputs[0].value;
