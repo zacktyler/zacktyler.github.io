@@ -1,2 +1,2 @@
 # zetyler.github.io
-Made some changes to the mazes styling so it is not as bad.
+Made some changes to the mazes styling to make it slightly less ugly.
