@@ -6,67 +6,91 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Ubuntu Regular'), local('Ubuntu-Regular'), url(https://fonts.gstatic.com/s/ubuntu/v14/4iCs6KVjbNBYlgoKfw72.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 * {
     margin: 0;
     box-sizing: border-box;
 }
 
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
 body {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     background-color: #000;
+    font-family: Ubuntu, sans-serif !important;
+    display: flex;
 }
 
-canvas {
-    position: absolute;
-}
-
-#setButton {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    width: 80px;
-    height: 45px;
-    background-color: hsla(180, 100%, 45%, 0.9);
-    border-radius: 5px;
-    z-index: 10;
-    font-size: 1rem;
-    text-align: center;
-    line-height: 45px;
-}
-
-#setButton:hover {
-    background-color: hsla(180, 100%, 60%, 0.9);
+#canvasContainer {
+    flex: 1;
 }
 
 #settings {
     background-color: rgba(128,128,128,0.8);
-    width: 100%;
+    width: 350px;
     height: 100%;
-    position: absolute;
-    display: none;
-    font-family: Righteous, sans-serif;
     overflow: auto;
-    grid-template: 4rem 4rem 4rem 4rem / 1fr 1fr;
-    grid-gap: 10px;
     padding: 10px;
+    text-align: center;
+}
+
+#settings h1 {
+    line-height: 50px;
+    background-color: #bbb;
+    margin-bottom: 20px;    
+}
+
+#settingsGrid {
+    display: grid;
+    grid-template: 4rem 4rem 4rem / 1fr 1fr;
+    grid-gap: 10px;
     justify-content: center;
     align-content: center;
     justify-items: center;
     align-items: center;
+    margin: 10px 0;
 }
 
-#settings p, #settings input, #settings select, #settings button {
+
+#settingsGrid p, #settingsGrid input, #settingsGrid select {
     height: 3rem;
     line-height: 3rem;
     padding: 0;
     border: none;
-    font-family: Righteous, sans-serif;
+    width: 100%;
 }
 
-#settings input, #settings button {
-    padding-left: 5px;
+#settings button {
+    height: 3rem;
+    line-height: 3rem;
+    padding: 0;
+    border: none;
+    width: 50%;
+    margin: 10px;
 }
 
-@media (min-width: 320px) {
+#settings p {
+    font-size: 2rem;
+}
+
+.slideContainer {
+    width: 100%;
+}
+
+/*@media (min-width: 320px) {
     #settings p, #settings input, #settings select, #settings button {
         font-size: 1.25rem;
         width: 40%;
@@ -78,7 +102,7 @@ canvas {
     #settings p, #settings input, #settings select, #settings button {
         font-size: 2rem;
     }
-}
+}*/
 
 .text p {
     display: inline;
@@ -91,8 +115,9 @@ canvas {
 }
 
 #settings input, #settings select, #settings button {
-    text-align: left;
-    justify-self: start;
+    text-align: center;
+    text-align-last: center;
+    font-size: 1.5rem;
 }
 
 input[type=number]::-webkit-inner-spin-button, 

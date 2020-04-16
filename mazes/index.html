@@ -8,34 +8,36 @@
     <link href="style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-    <canvas></canvas>
-    <div id="setButton">Settings</div>
+    <div id="canvasContainer">
+        <canvas></canvas>
+    </div>
+    <!--<div id="setButton">Settings</div>-->
     <div id="settings">
-        <div class="text">
-            <p>Run Speed</p>
-            <br>
-            <span>(# steps per frame)</span>
-        </div>
-        <input class="set" type="number" value="1">
-        
-        <div class="text">
-            <p>Cell Size</p>
-            <br>
-            <span>(cell width in px)</span>
-        </div>
-        <input class="set" type="number" value="30">
+        <h1>Settings</h1>
+        <div id="settingsGrid">
+            <div class="text">
+                <p>Run Speed</p>
+            </div>
+            <div class="slideContainer">
+                <input type="range" min="0" max="30" value="0" class="set slider" id="myRange">
+            </div>
+            <!--<input class="set" type="number" value="1">-->
+            
+            <div class="text">
+                <p>Cell Size</p>
+            </div>
+            <input class="set" type="number" value="30">
 
-        <div class="text">
-            <p>Algorithm</p>
+            <div class="text">
+                <p>Algorithm</p>
+            </div>
+            <select class="set">
+                <option value="RB">Backtracker</option>
+                <option value="PA">Prim's</option>
+                <option value="PR">Prim's+Back</option>
+                <option value="KA">Kruskal's</option>
+            </select>
         </div>
-        <select class="set">
-            <option value="RB">Backtracker</option>
-            <option value="PA">Prim's</option>
-            <option value="PR">Prim's+Back</option>
-            <option value="KA">Kruskal's</option>
-        </select>
-
-        <p></p>
         <button id="new">
             New Maze!
         </button>

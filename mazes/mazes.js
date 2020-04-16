@@ -1,16 +1,17 @@
 var canvas = document.querySelector('canvas');
 var pen = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+var rect = canvas.parentNode.getBoundingClientRect();
+canvas.width = rect.width;
+canvas.height = rect.height;
 
 var paused = false;
 var running = false;
 var solving = false;
-var setButton = document.querySelector('#setButton');
 var setWindow = document.querySelector('#settings');
 var inputs = setWindow.querySelectorAll('.set');
 var newButton = setWindow.querySelector('#new');
 var solveButton = setWindow.querySelector('#solve');
+var slider = setWindow.querySelector('#myRange');
 var settings = [];
 getAllSettings();
 
@@ -21,35 +22,26 @@ function getAllSettings() {
     }
 }
 
-function toggleSettings() {
-    paused = !paused;
-    if (paused) {
-        setWindow.style.display = 'grid';
-    } else {
-        setWindow.style.display = 'none';
-        settings[0] = inputs[0].value;
-    }
-}
-
 window.addEventListener('resize', function () {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    rect = canvas.parentNode.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
     reset();
-});
-
-setButton.addEventListener('click', function () {
-    toggleSettings();
 });
 
 newButton.addEventListener('click', function () {
     getAllSettings();
-    toggleSettings();
+    //toggleSettings();
     reset();
 });
 
 solveButton.addEventListener('click', function () {
     startSolve();
-    toggleSettings();
+    //toggleSettings();
+});
+
+slider.addEventListener('input', function () {
+    settings[0] = slider.value;
 });
 
 class Cell {
@@ -313,7 +305,7 @@ function startSolve() {
 
 function step() {
     if (!paused) {
-        for (let i = 0 ; i < settings[0]; i++) {
+        for (let i = 0 ; i < Math.pow(10, settings[0] / 10) ; i++) {
             if (solving) {
                 maze.solveAlgorithm();
             } else {
